@@ -1,43 +1,81 @@
-const Converter = {
+const Unit = {
     Radian:
-        /** @param {number} degree ラジアン */
         class {
             constructor(degree) {
-                if (typeof (degree) === 'number') {
-                    this.degree = degree;
-                }
-                else {
-                    console.error('引数のエラー');
-                    this.degree = number
-                }
+                (typeof (degree) === 'number') ? this.degree = degree : this.degree = NaN;
             }
-            /** @returns {number} 角度*/
             toAngle() {
-                return this.degree * (180 / Math.PI);
+                return new Unit.Angle(this.degree * (180 / Math.PI));
             }
         },
     Angle:
-        /** @param {number} degree 角度*/
         class {
             constructor(degree) {
-                if (typeof (degree) === 'number') {
-                    this.degree = degree;
-                }
-                else {
-                    console.error('引数のエラー');
-                    this.degree = NaN;
-                }
+                (typeof (degree) === 'number') ? this.degree = degree : this.degree = NaN;
             }
-            /** @returns {number} ラジアン*/
             toRadian() {
-                return this.degree * Math.PI / 180;
+                return new Unit.Radian(this.degree * Math.PI / 180)
             }
         }
+}
+class DOMParts {
+    constructor(type, options = { size: 48, position: undefined }) {
+        const InfoMap = new Map([
+            ['loader',
+                () => {
+                    const loader = document.createElement('span');
+                    loader.classList.add('loader');
+                    loader.style.width = options.size;
+                    loader.style.height = options.size;
+                    addPosOP(loader, options.position, 'rerative')
+                    return loader;
+                }],
+            ['fullscreen',
+                () => {
+                    const div = document.createElement('div')
+                    div.classList.add('fullscreen', 'absolute');
+                    addPosOP(div, options.position, 'absolute')
+                    return div;
+                }
+            ],
+            ['fullscreenLoader',
+            ()=>{
+                const pearent = new DOMParts('fullscreen');
+                pearent.element.classList.add('centering');
+                const loadericon = new DOMParts('loader');
+                loadericon.added(pearent.element);
+                return pearent.element ;
+            }
+        ]
+        ])
+        function addPosOP(element, type, defaultValue = 'rerative') {
+            switch (type) {
+                case undefined:
+                    element.classList.add(defaultValue);
+                    break;
+                case 'relative':
+                    element.classList.add('rerative');
+                    break;
+                case 'absolute':
+                    element.classList.add('absolute');
+
+            }
+        }
+        this.element = InfoMap.get(type)();
+    }
+    added(element, options = {}) {
+        element.appendChild(this.element);
+    }
+    removed(element) {
+        element.removeChild(this.element);
+    }
 }
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import {EventArea} from './module/EVArea.js';
+
+import { EventArea } from './module/EVArea.js';
+
 const setings = {
     fov: 45,
     AmbientLight: {
@@ -46,32 +84,31 @@ const setings = {
     }
 
 }
+window.addEventListener('load',()=>{
+    document.getElementById('windowStatus').style.display='none'
+})
 // ページの読み込みを待つ
 window.addEventListener('DOMContentLoaded', init);
 async function init() {
+
     const renderer = new THREE.WebGLRenderer({
         canvas: document.querySelector('#myCanvas'),
         // 物体の輪郭がガクガクするのを抑える
         antialias: true
     });
-
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(setings.fov);
     camera.position.set(0, 0, +1000);
+
     window.addEventListener('resize', resizeWindow);
     resizeWindow();
+
     // カメラコントローラーを作成
     const controls = new OrbitControls(camera, document.body);
     // 滑らかにカメラコントローラーを制御する
     controls.enableDamping = true;
     controls.dampingFactor = 0.2;
-    const loadericon=document.getElementById('loader');
-    loadericon.style.display='block';
-
     const course = await loadGLTF_Async('./models/course.gltf');
-    //確認用
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    loadericon.style.display='none';
     scene.add(course);
     course.scale.set(30, 30, 30);
     // 平行光源
@@ -96,8 +133,13 @@ async function init() {
     }
     async function loadGLTF_Async(src, func) {
         if (!(src.endsWith('gltf')) && !(src.endsWith('glb'))) { return }
+        const loaderDisplay=new DOMParts('fullscreenLoader');
+        loaderDisplay.added(document.body);
         const loader = new GLTFLoader();
         const objects = await loader.loadAsync(src, func);
+        loaderDisplay.removed(document.body);
         return objects.scene;
     }
+
+
 }

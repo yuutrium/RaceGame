@@ -2,28 +2,31 @@
 <html lang="Ja">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="styleseet" href="https://unpkg.com/ress/dist/ress.min.css">
-    <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="styleseet" href="https://unpkg.com/ress/dist/ress.min.css">
+  <link rel="stylesheet" href="style.css">
+  <title>Document</title>
 </head>
 
 <body>
-    <canvas id="myCanvas"></canvas>
-    <span class="loader" id="loader"></span>
-    <script type="importmap">
+  <canvas id="myCanvas"></canvas>
+  <div class="fullscreen absolute centering" id="windowStatus" style="background-color: rgb(73, 70, 88);">
+    <span class="loader rerative"></span>
+    <div style="margin-left: 20px;">
+      <span style="font-weight: bold;color: rgb(255, 255, 255);">Now Loading...</span>
+      <div style="font-weight: bold;color: rgb(255, 255, 255);">©WEBアプリ開発班</div>
+    </div>
+  </div>
+  <script type="importmap">
         {
           "imports": {
             "three": "https://unpkg.com/three@0.151.3/build/three.module.js",
             "three/addons/": "https://unpkg.com/three@0.151.3/examples/jsm/"
           }
         }</script>
-    <!--<script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://unpkg.com/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>-->
-    <script type="module" src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 
 </html>
