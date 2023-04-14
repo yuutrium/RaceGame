@@ -44,7 +44,7 @@ class DOMParts {
                 pearent.element.classList.add('centering');
                 const loadericon = new DOMParts('loader');
                 loadericon.added(pearent.element);
-                return pearent.element ;
+                return pearent.element;
             }
         ]
         ])
@@ -73,7 +73,7 @@ class DOMParts {
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
+import { CreateParts } from './module/CreateParts.js';
 import { EventArea } from './module/EVArea.js';
 
 const setings = {
@@ -133,11 +133,12 @@ async function init() {
     }
     async function loadGLTF_Async(src, func) {
         if (!(src.endsWith('gltf')) && !(src.endsWith('glb'))) { return }
-        const loaderDisplay=new DOMParts('fullscreenLoader');
-        loaderDisplay.added(document.body);
+        const loaderDisplay=new CreateParts.fullscreenLoader('absolute',{textArea:'Loading'});
+        document.body.appendChild(loaderDisplay.bodyNode);
+        loaderDisplay.textArea.style.color='white'
         const loader = new GLTFLoader();
         const objects = await loader.loadAsync(src, func);
-        loaderDisplay.removed(document.body);
+        document.body.removeChild(loaderDisplay.bodyNode);
         return objects.scene;
     }
 
