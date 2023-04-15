@@ -75,8 +75,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CreateParts } from './module/CreateParts.js';
 import { EventArea } from './module/EVArea.js';
-console.log(THREE);
-
 const setings = {
     fov: 45,
     AmbientLight: {
@@ -91,7 +89,6 @@ window.addEventListener('load',()=>{
 // ページの読み込みを待つ
 window.addEventListener('DOMContentLoaded', init);
 async function init() {
-
     const renderer = new THREE.WebGLRenderer({
         canvas: document.querySelector('#myCanvas'),
         // 物体の輪郭がガクガクするのを抑える
