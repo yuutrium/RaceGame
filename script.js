@@ -75,6 +75,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CreateParts } from './module/CreateParts.js';
 import { EventArea } from './module/EVArea.js';
+console.log(THREE);
 
 const setings = {
     fov: 45,
