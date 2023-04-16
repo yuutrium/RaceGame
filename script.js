@@ -18,74 +18,22 @@ const Unit = {
             }
         }
 }
-class DOMParts {
-    constructor(type, options = { size: 48, position: undefined }) {
-        const InfoMap = new Map([
-            ['loader',
-                () => {
-                    const loader = document.createElement('span');
-                    loader.classList.add('loader');
-                    loader.style.width = options.size;
-                    loader.style.height = options.size;
-                    addPosOP(loader, options.position, 'rerative')
-                    return loader;
-                }],
-            ['fullscreen',
-                () => {
-                    const div = document.createElement('div')
-                    div.classList.add('fullscreen', 'absolute');
-                    addPosOP(div, options.position, 'absolute')
-                    return div;
-                }
-            ],
-            ['fullscreenLoader',
-            ()=>{
-                const pearent = new DOMParts('fullscreen');
-                pearent.element.classList.add('centering');
-                const loadericon = new DOMParts('loader');
-                loadericon.added(pearent.element);
-                return pearent.element;
-            }
-        ]
-        ])
-        function addPosOP(element, type, defaultValue = 'rerative') {
-            switch (type) {
-                case undefined:
-                    element.classList.add(defaultValue);
-                    break;
-                case 'relative':
-                    element.classList.add('rerative');
-                    break;
-                case 'absolute':
-                    element.classList.add('absolute');
-
-            }
-        }
-        this.element = InfoMap.get(type)();
-    }
-    added(element, options = {}) {
-        element.appendChild(this.element);
-    }
-    removed(element) {
-        element.removeChild(this.element);
-    }
-}
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { CreateParts } from './module/CreateParts.js';
+import * as CreateParts from './module/CreateParts2.js';
 import { EventArea } from './module/EVArea.js';
 const setings = {
     fov: 45,
     AmbientLight: {
         color: 0xFFFFFF,
-        float: 1
+        float: 1.0
     }
-
 }
-window.addEventListener('load',()=>{
-    document.getElementById('windowStatus').style.display='none'
+window.addEventListener('load', () => {
+    document.getElementById('windowStatus').style.display = 'none'
 })
+console.time('load')
 // ページの読み込みを待つ
 window.addEventListener('DOMContentLoaded', init);
 async function init() {
@@ -107,6 +55,7 @@ async function init() {
     controls.enableDamping = true;
     controls.dampingFactor = 0.2;
     const course = await loadGLTF_Async('./models/course.gltf');
+
     scene.add(course);
     course.scale.set(30, 30, 30);
     // 平行光源
@@ -114,7 +63,7 @@ async function init() {
     directionalLight.position.set(1, 1, 1);
     // シーンに追加
     scene.add(directionalLight);
-
+    console.timeEnd('load');
     tick();
 
     // 毎フレーム時に実行されるループイベント
@@ -131,12 +80,27 @@ async function init() {
     }
     async function loadGLTF_Async(src, func) {
         if (!(src.endsWith('gltf')) && !(src.endsWith('glb'))) { return }
-        const loaderDisplay=new CreateParts.fullscreenLoader('absolute',{textArea:'Loading'});
-        document.body.appendChild(loaderDisplay.bodyNode);
-        loaderDisplay.textArea.style.color='white'
+        const innerHTML=new CreateParts.multiple({
+            tagName:'div',
+            quantity:2,
+        })
+        innerHTML.section[0].innerText='Loading...';
+        innerHTML.section[1].innerText='©WEBアプリ制作班';
+        const displayloader=new CreateParts.fullscreenLoader({
+            child:{
+                className:['centering'],
+                child:{
+                    className:['title','white',]
+                }
+            },
+            className:'bac-black',
+            innerHTML:innerHTML.body
+        }).body
+
+        document.body.appendChild(displayloader)
         const loader = new GLTFLoader();
         const objects = await loader.loadAsync(src, func);
-        document.body.removeChild(loaderDisplay.bodyNode);
+        document.body.removeChild(displayloader)
         return objects.scene;
     }
 

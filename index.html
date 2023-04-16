@@ -12,13 +12,17 @@
 
 <body>
   <canvas id="myCanvas"></canvas>
-  <div class="fullscreen absolute centering" id="windowStatus" style="background-color: rgb(73, 70, 88);">
-    <span class="loader rerative"></span>
-    <div style="margin-left: 20px;">
-      <span style="font-weight: bold;color: rgb(255, 255, 255);">Now Loading...</span>
-      <div style="font-weight: bold;color: rgb(255, 255, 255);">©WEBアプリ開発班</div>
-    </div>
-  </div>
+  <section class="absolute centering bac-black" id="windowStatus" style="width: 100%; height: 100vh;">
+    <section class="rerative centering">
+      <div class="title white"><span class="loader"></span></div>
+      <div class="title white">
+        <div class="rerative">
+          <div>Loading...</div>
+          <div>©WEBアプリ制作班</div>
+        </div>
+      </div>
+    </section>
+  </section>
   <!--importmap非対応ブラウザでも動くように-->
   <script async src="https://ga.jspm.io/npm:es-module-shims@1.7.1/dist/es-module-shims.js"></script>
   <script type="importmap">
