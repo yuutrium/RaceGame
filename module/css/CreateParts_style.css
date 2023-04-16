@@ -1,0 +1,14 @@
+.crP-posOP-absolute{
+    position: absolute;
+    z-index: 1;
+    top: 0px;
+    left: 0px;
+}
+.crP-posOP-rerative{
+    position: relative;
+}
+.crP-posOP-centering{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

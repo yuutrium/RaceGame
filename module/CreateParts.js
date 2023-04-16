@@ -1,132 +1,146 @@
-export const CreateParts = {
-    loader: class {
-        constructor({ position = 'rerative', size = 48, addclass = '' }={}) {
-            const loader = document.createElement('span');
-            loader.classList.add('loader');
-            loader.style.width = size;
-            loader.style.height = size;
-            addClass(loader, addclass);
-            addPosDetail(loader, position,);
-            this.bodyNode = loader;
+const css=document.createElement("link");
+css.setAttribute("rel","stylesheet");
+css.setAttribute("href","module/css/CreateParts_style.css");
+document.getElementsByTagName("head")[0].appendChild(css);
+class element {
+    constructor({ tagName = 'div', position = 'auto', width, height, className} = {}) {
+        if (typeof tagName !== 'string') { return; }
+        const body = document.createElement(tagName);
+        if(typeof width === 'number'||typeof width === 'string'){body.style.width = width;}
+        if(typeof height === 'number'||typeof width === 'string'){body.style.height = height;}
+        switch (position) {
+            case 'relative':
+                body.classList.add('crP-posOP-rerative');
+                break;
+            case 'absolute':
+                body.classList.add('crP-posOP-absolute');
+                break;
+            default:
+                break;
         }
-    },
-    fullscreen: class {
-        constructor({ position = 'absolute', addclass = '' }={}) {
-            const div = document.createElement('div')
-            div.classList.add('fullscreen');
-            addClass(div, addclass);
-            addPosDetail(div, position);
-            this.bodyNode = div;
+        if(Array.isArray(className)){
+            className.forEach((x) => {
+                addClass(x)
+            })
         }
-    },
-    fullscreenLoader: class {
-        constructor({ position = 'absolute', innerHTML = "", addclass = '',ColorStyle='black'}={}) {
-            //2カラムのインナー作成
-            const inner = new CreateParts.Division({ divisionCount: 2, addclass: 'centering' })
-            //1カラム目,2カラム目にアイコン,ノードを追加
-            const loderArea = inner.mainSection[0];
-            const textArea = inner.mainSection[1];
-            const mainSection=inner.bodyNode;
-            loderArea.appendChild(new CreateParts.loader().bodyNode);
-            textArea.append(innerHTML)
-            //全画面のdiv作成
-            const body = new CreateParts.fullscreen({ addclass: 'centering' }).bodyNode;
-            //全画面のdivに子ノードとして追加
-            body.appendChild(mainSection);
-            addClass(body, addclass);
-            addPosDetail(body, position);
-            this.bodyNode = body;
-            this.mainSection = mainSection;
-            this.TextArea = textArea;
-            this.addColorStyle(ColorStyle);
+        else{
+            addClass(className);
         }
-        addColorStyle(type) {
-            switch (type) {
-                case 'black':
-                    this.TextArea.classList.add('white', 'title');
-                    this.bodyNode.classList.add('bac-black');
-                    break;
-                case 'white':
-                    this.TextArea.classList.add('black', 'title');
-                    this.bodyNode.classList.add('bac-white');
+        function addClass(name) {
+            if (typeof name === 'string'&&name.length > 0){
+                body.classList.add(name);
             }
         }
-    },
-    Division: class {
-        constructor({ position = 'rerative', divisionCount = 2, addclass = '' }={}) {
-            const pearent = document.createElement('div')
-            this.mainSection = new Array(divisionCount);
-            for (let i = 0; i < divisionCount; i++) {
-                this.mainSection[i] = document.createElement('div')
-                pearent.appendChild(this.mainSection[i]);
-            }
-            addClass(pearent, addclass);
-            addPosDetail(pearent, position);
-            this.bodyNode = pearent
-        }
+        this.body = body;
     }
 }
-function addPosDetail(element, type) {
-    switch (type) {
-        case 'relative':
-            element.classList.add('rerative');
-            break;
-        case 'absolute':
-            element.classList.add('absolute');
-            break;
-        default:
-            element.classList.add('rerative');
-
-    }
-}
-function addClass(element, addedClass='') {
-    if (typeof addedClass === 'string') {
-        if(addedClass.length>0){
-            element.classList.add(addedClass);
-        }
-    }
-    else if (Array.isArray(addedClass)) {
-        addedClass.forEach((x) => {
-            element.classList.add(x)
+class loader extends element {
+    constructor({ position = 'auto', width = 48, height = 48, className } = {}) {
+        super({
+            tagName: 'span',
+            position: position,
+            width: width,
+            height: height,
+            className: className
         })
+        console.log()
+        const root= this.body.attachShadow({
+            mode:'open'
+        });
+        root.innerHTML=`
+        <style>
+        :host {
+            display: block;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            animation: rotate 1s linear infinite;
+        }
+        
+        :host::before,
+        :host::after {
+            content: "";
+            box-sizing: border-box;
+            inset: 0px;
+            position: absolute;
+            border-radius: 50%;
+            border: 5px solid #FFF;
+            animation: prixClipFix 2s linear infinite;
+        }
+        
+        :host::after {
+            border-color: #00f8a5;
+            animation: prixClipFix 2s linear infinite, rotate 0.5s linear infinite reverse;
+            inset: 6px;
+        }
+        @keyframes rotate {
+            0% {transform: rotate(0deg)}
+            100% {transform: rotate(360deg)}
+        }
+        @keyframes prixClipFix {
+            0% {clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0)}
+            25% {clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0)}
+            50% {clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%)}
+            75% {clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%)}
+            100% { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0)}
+        }
+        </style>
+        `;
+
     }
 }
-const _CreateParts={
-    element:class{
-        constructor({tagName='div',position='rerative',width,height,classname}){
-            const body=document.createElement(tagName);
-            if(typeof width==='number'){body.style.width=width;}
-            if(typeof height==='number'){body.style.height=height;}
-            switch (position) {
-                case 'relative':
-                    body.classList.add('rerative');
-                    break;
-                case 'absolute':
-                    body.classList.add('absolute');
-                    break;
-                default:
-                    body.classList.add('rerative');
-            }
-            if (typeof classname === 'string') {
-                addClass(classname);
-            }
-            else if (Array.isArray(classname)) {
-                classname.forEach((x) => {
-                    addClass(x)
-                })
-            }
-            function addClass(name){
-                if(name.length>0){
-                    body.classList.add(name);
-                }
-            }
-            this.body=body;
+class multiple extends element {
+    constructor({ tagName = 'section', position = 'auto', width, height, className, child = { tagName: 'div', className },quantity = 2 } = {}) {
+        const classNameArray = ['crP-posOP-rerative'];
+        super({
+            tagName: tagName,
+            position: position,
+            width: width,
+            height: height,
+            className: classNameArray.concat(className),
+        })
+        const body = this.body;
+        const section = new Array(quantity);
+        for (let i = 0; i < quantity; i++) {
+            section[i] = new element({
+                tagName: child.tagName,
+                position: 'rerative',
+                className: child.className
+            }).body
+            body.appendChild(section[i]);
+            
         }
-    },
-    loader:class extends _CreateParts.element{
-        constructor(){
-
-        }
+        this.section = section
     }
-
+}
+class fullscreenLoader extends element {
+    constructor({ tagName = 'section', position = 'absolute',className,child = { className,child:{className} } , innerHTML=''} = {}) {
+        const classNameArray = ['crP-posOP-centering'];
+        super({
+            tagName: tagName,
+            position: position,
+            width: '100%',
+            height: '100vh',
+            className: classNameArray.concat(className),
+        })
+        const body=this.body;
+        const inner = new multiple({
+            tagName: 'section',
+            position: 'rerative',
+            quantity: 2,
+            className: child.className,
+            child: {
+                tagName: 'div',
+                className:child.child.className
+            }
+        })
+        const loderArea = inner.section[0];
+        const textArea = inner.section[1];
+        loderArea.appendChild(new loader().body)
+        textArea.append(innerHTML);
+        body.appendChild(inner.body);
+    }
+}
+export {
+    element, loader,multiple,fullscreenLoader
 }

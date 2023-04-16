@@ -1,33 +1,51 @@
-const Unit = {
-    Radian:
-        class {
-            constructor(degree) {
-                (typeof (degree) === 'number') ? this.degree = degree : this.degree = NaN;
-            }
-            toAngle() {
-                return new Unit.Angle(this.degree * (180 / Math.PI));
-            }
-        },
-    Angle:
-        class {
-            constructor(degree) {
-                (typeof (degree) === 'number') ? this.degree = degree : this.degree = NaN;
-            }
-            toRadian() {
-                return new Unit.Radian(this.degree * Math.PI / 180)
-            }
-        }
-}
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import * as CreateParts from './module/CreateParts2.js';
+import * as CreateParts from './module/CreateParts.js';
 import { EventArea } from './module/EVArea.js';
-const setings = {
+import *as Unit from './module/Unit.js';
+const settings = {
     fov: 45,
-    AmbientLight: {
+    directionalLight: {
         color: 0xFFFFFF,
-        float: 1.0
+    }
+}
+const Parts={
+    fullscreenLoader:(text)=>{
+        const innerHTML=new CreateParts.multiple({
+            tagName:'div',
+            quantity:2,
+        })
+        innerHTML.section[0].innerText='Loading...';
+        innerHTML.section[1].innerText=text;
+        const displayloader=new CreateParts.fullscreenLoader({
+            child:{
+                className:['centering'],
+                child:{
+                    className:['title','white',]
+                }
+            },
+            className:'bac-black',
+            innerHTML:innerHTML.body
+        }).body
+        return displayloader;
+    }
+}
+class SkyBox extends THREE.Mesh{
+    constructor(urls){
+        if(!Array.isArray(urls)){return}
+        const  cubeTextureLoader = new THREE.CubeTextureLoader();
+        const  textureCube = cubeTextureLoader.load(urls);
+        const  shader = THREE.ShaderLib['cube'];
+        shader.uniforms['tCube'].value = textureCube;
+        const material = new THREE.ShaderMaterial({
+            fragmentShader: shader.fragmentShader,
+            vertexShader: shader.vertexShader,
+            uniforms: shader.uniforms,
+            depthWrite: false,
+            side: THREE.BackSide
+          });
+          super(new THREE.BoxGeometry(100, 100, 100), material)
     }
 }
 window.addEventListener('load', () => {
@@ -43,30 +61,21 @@ async function init() {
         antialias: true
     });
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(setings.fov);
+    scene.fog = new THREE.FogExp2( 0x252c32, 0.002 );
+    const camera = new THREE.PerspectiveCamera(settings.fov);
     camera.position.set(0, 0, +1000);
-
     window.addEventListener('resize', resizeWindow);
     resizeWindow();
-
-    // カメラコントローラーを作成
     const controls = new OrbitControls(camera, document.body);
     // 滑らかにカメラコントローラーを制御する
     controls.enableDamping = true;
     controls.dampingFactor = 0.2;
-    const course = await loadGLTF_Async('./models/course.gltf');
-
-    scene.add(course);
-    course.scale.set(30, 30, 30);
-    // 平行光源
-    const directionalLight = new THREE.DirectionalLight(0xFFFFFF);
-    directionalLight.position.set(1, 1, 1);
-    // シーンに追加
-    scene.add(directionalLight);
+    addModel();
+    addLight();
+    addSkyBox();
     console.timeEnd('load');
     tick();
 
-    // 毎フレーム時に実行されるループイベント
     function tick() {
         controls.update();
         renderer.render(scene, camera); // レンダリング
@@ -78,31 +87,39 @@ async function init() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
     }
-    async function loadGLTF_Async(src, func) {
+    async function loadGLTF_withDisplay_Async({src, func,text}) {
         if (!(src.endsWith('gltf')) && !(src.endsWith('glb'))) { return }
-        const innerHTML=new CreateParts.multiple({
-            tagName:'div',
-            quantity:2,
-        })
-        innerHTML.section[0].innerText='Loading...';
-        innerHTML.section[1].innerText='©WEBアプリ制作班';
-        const displayloader=new CreateParts.fullscreenLoader({
-            child:{
-                className:['centering'],
-                child:{
-                    className:['title','white',]
-                }
-            },
-            className:'bac-black',
-            innerHTML:innerHTML.body
-        }).body
-
-        document.body.appendChild(displayloader)
+        const loderElement=Parts.fullscreenLoader(text)
+        document.body.appendChild(loderElement)
         const loader = new GLTFLoader();
         const objects = await loader.loadAsync(src, func);
-        document.body.removeChild(displayloader)
+        document.body.removeChild(loderElement)
         return objects.scene;
     }
-
-
+    async function addModel(){
+        const course = await loadGLTF_withDisplay_Async({src:'./models/course.gltf',text:'©WEBアプリ制作班'});
+        course.scale.set(30, 30, 30);
+        scene.add(course);
+    }
+    function addLight(){
+    // 平行光源
+    const directionalLight = new THREE.DirectionalLight(settings.directionalLight.color);
+    directionalLight.position.set(1, 1, 1);
+    scene.add(directionalLight);
+    }
+    function addSkyBox(){
+        const path='img/MegaSun'
+        const urls=[
+            path + 'Left.jpg', //左
+            path + 'Right.jpg', //右
+            path + 'Top.jpg', //上
+            path + 'Bottom.jpg', //下
+            path + 'Front.jpg', //前
+            path + 'Back.jpg'  //後
+        ]
+        const sky=new SkyBox(urls)
+        sky.scale.set(50, 50, 50);
+        scene.add(sky);
+    }
 }
+
