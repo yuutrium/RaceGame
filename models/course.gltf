@@ -105,6 +105,62 @@
             ]
         }
     ],
+    "materials" : [
+        {
+            "doubleSided" : true,
+            "name" : "\u30de\u30c6\u30ea\u30a2\u30eb.001",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.4969233274459839,
+                    0.3639459013938904,
+                    0.17505106329917908,
+                    1
+                ],
+                "metallicFactor" : 0
+            }
+        },
+        {
+            "doubleSided" : true,
+            "name" : "\u30de\u30c6\u30ea\u30a2\u30eb",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.16513186693191528,
+                    0.24228087067604065,
+                    0.3094688951969147,
+                    1
+                ],
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        },
+        {
+            "doubleSided" : true,
+            "name" : "\u30de\u30c6\u30ea\u30a2\u30eb.002",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.05559529736638069,
+                    0.06504462659358978,
+                    0.10653398185968399,
+                    1
+                ],
+                "metallicFactor" : 0.0314960777759552
+            }
+        },
+        {
+            "doubleSided" : true,
+            "name" : "\u30de\u30c6\u30ea\u30a2\u30eb.003",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.16513186693191528,
+                    0.24228087067604065,
+                    0.3094688951969147,
+                    1
+                ],
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        }
+    ],
     "meshes" : [
         {
             "name" : "\u5e73\u9762.002",
@@ -115,7 +171,8 @@
                         "NORMAL" : 1,
                         "TEXCOORD_0" : 2
                     },
-                    "indices" : 3
+                    "indices" : 3,
+                    "material" : 0
                 }
             ]
         },
@@ -141,7 +198,8 @@
                         "NORMAL" : 9,
                         "TEXCOORD_0" : 10
                     },
-                    "indices" : 11
+                    "indices" : 11,
+                    "material" : 1
                 }
             ]
         },
@@ -154,7 +212,8 @@
                         "NORMAL" : 13,
                         "TEXCOORD_0" : 14
                     },
-                    "indices" : 15
+                    "indices" : 15,
+                    "material" : 2
                 }
             ]
         },
@@ -167,7 +226,8 @@
                         "NORMAL" : 17,
                         "TEXCOORD_0" : 18
                     },
-                    "indices" : 11
+                    "indices" : 11,
+                    "material" : 3
                 }
             ]
         }

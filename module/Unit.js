@@ -3,7 +3,7 @@ class Radian {
         (typeof (degree) === 'number') ? this.degree = degree : this.degree = NaN;
     }
     toAngle() {
-        return new Unit.Angle(this.degree * (180 / Math.PI));
+        return new Angle(this.degree * (180 / Math.PI));
     }
 }
 class Angle {
@@ -11,7 +11,7 @@ class Angle {
         (typeof (degree) === 'number') ? this.degree = degree : this.degree = NaN;
     }
     toRadian() {
-        return new Unit.Radian(this.degree * Math.PI / 180)
+        return new Radian(this.degree * Math.PI / 180)
     }
 }
 export{

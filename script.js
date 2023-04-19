@@ -1,42 +1,39 @@
-import * as THREE from "three";
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as CreateParts from './module/CreateParts.js';
 import { EventArea } from './module/EVArea.js';
 import *as Unit from './module/Unit.js';
 const settings = {
     fov: 45,
     directionalLight: {
-        color: 0xFFFFFF,
+        color: 0xd1d1d1,
     }
 }
-const Parts={
-    fullscreenLoader:(text)=>{
-        const innerHTML=new CreateParts.multiple({
-            tagName:'div',
-            quantity:2,
+const Parts = {
+    fullscreenLoader: (text) => {
+        const innerHTML = new CreateParts.multiple({
+            tagName: 'div',
+            quantity: 2,
         })
-        innerHTML.section[0].innerText='Loading...';
-        innerHTML.section[1].innerText=text;
-        const displayloader=new CreateParts.fullscreenLoader({
-            child:{
-                className:['centering'],
-                child:{
-                    className:['title','white',]
+        innerHTML.section[0].innerText = 'Loading...';
+        innerHTML.section[1].innerText = text;
+        const displayloader = new CreateParts.fullscreenLoader({
+            child: {
+                className: ['centering'],
+                child: {
+                    className: ['title', 'white',]
                 }
             },
-            className:'bac-black',
-            innerHTML:innerHTML.body
+            className: 'bac-black',
+            innerHTML: innerHTML.body
         }).body
         return displayloader;
     }
 }
-class SkyBox extends THREE.Mesh{
-    constructor(urls){
-        if(!Array.isArray(urls)){return}
-        const  cubeTextureLoader = new THREE.CubeTextureLoader();
-        const  textureCube = cubeTextureLoader.load(urls);
-        const  shader = THREE.ShaderLib['cube'];
+class SkyBox extends THREE.Mesh {
+    constructor(urls) {
+        if (!Array.isArray(urls)) { return }
+        const cubeTextureLoader = new THREE.CubeTextureLoader();
+        const textureCube = cubeTextureLoader.load(urls);
+        const shader = THREE.ShaderLib['cube'];
         shader.uniforms['tCube'].value = textureCube;
         const material = new THREE.ShaderMaterial({
             fragmentShader: shader.fragmentShader,
@@ -44,8 +41,8 @@ class SkyBox extends THREE.Mesh{
             uniforms: shader.uniforms,
             depthWrite: false,
             side: THREE.BackSide
-          });
-          super(new THREE.BoxGeometry(100, 100, 100), material)
+        });
+        super(new THREE.BoxGeometry(100, 100, 100), material)
     }
 }
 window.addEventListener('load', () => {
@@ -61,16 +58,17 @@ async function init() {
         antialias: true
     });
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2( 0x252c32, 0.002 );
+    scene.fog = new THREE.FogExp2(0xFFFFFF, 0.001);
     const camera = new THREE.PerspectiveCamera(settings.fov);
     camera.position.set(0, 0, +1000);
     window.addEventListener('resize', resizeWindow);
     resizeWindow();
-    const controls = new OrbitControls(camera, document.body);
+    const controls = new THREE.OrbitControls(camera, document.body);
     // 滑らかにカメラコントローラーを制御する
     controls.enableDamping = true;
     controls.dampingFactor = 0.2;
     addModel();
+    //addPlane()
     addLight();
     addSkyBox();
     console.timeEnd('load');
@@ -87,29 +85,37 @@ async function init() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
     }
-    async function loadGLTF_withDisplay_Async({src, func,text}) {
+    async function loadGLTF_withDisplay_Async({ src, func, text }) {
         if (!(src.endsWith('gltf')) && !(src.endsWith('glb'))) { return }
-        const loderElement=Parts.fullscreenLoader(text)
+        const loderElement = Parts.fullscreenLoader(text)
         document.body.appendChild(loderElement)
-        const loader = new GLTFLoader();
+        const loader = new THREE.GLTFLoader();
         const objects = await loader.loadAsync(src, func);
         document.body.removeChild(loderElement)
         return objects.scene;
     }
-    async function addModel(){
-        const course = await loadGLTF_withDisplay_Async({src:'./models/course.gltf',text:'©WEBアプリ制作班'});
+    async function addModel() {
+        const course = await loadGLTF_withDisplay_Async({ src: './models/course_b.glb', text: '©WEBアプリ制作班' });
         course.scale.set(30, 30, 30);
         scene.add(course);
+        const buggy = await loadGLTF_withDisplay_Async({ src: './models/buggy.glb', text: '©WEBアプリ制作班' });
+        buggy.position.set(-200, 7, -20);
+        buggy.scale.set(5, 5, 5);
+        scene.add(buggy);
+
+
     }
-    function addLight(){
-    // 平行光源
-    const directionalLight = new THREE.DirectionalLight(settings.directionalLight.color);
-    directionalLight.position.set(1, 1, 1);
-    scene.add(directionalLight);
+    function addLight() {
+        // 平行光源
+        const directionalLight = new THREE.DirectionalLight(settings.directionalLight.color, 2.0);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+        const AmbientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+        scene.add(AmbientLight);
     }
-    function addSkyBox(){
-        const path='img/MegaSun'
-        const urls=[
+    function addSkyBox() {
+        const path = 'img/FluffballDay2/FluffballDay'
+        const urls = [
             path + 'Left.jpg', //左
             path + 'Right.jpg', //右
             path + 'Top.jpg', //上
@@ -117,9 +123,22 @@ async function init() {
             path + 'Front.jpg', //前
             path + 'Back.jpg'  //後
         ]
-        const sky=new SkyBox(urls)
+        const sky = new SkyBox(urls)
         sky.scale.set(50, 50, 50);
         scene.add(sky);
+    }
+    function addPlane() {
+        const plane = new THREE.Mesh(
+            new THREE.PlaneGeometry(3000, 3000, 1, 1),
+            new THREE.MeshLambertMaterial({
+                color: 0xFFDE9E
+            }));
+
+        //シーンオブジェクトに追加
+        plane.rotation.x = (new Unit.Angle(270).toRadian().degree);
+        plane.position.set(0, -5, 0);
+        scene.add(plane);
+
     }
 }
 
