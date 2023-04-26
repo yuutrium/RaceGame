@@ -1,13 +1,12 @@
-const css=document.createElement("link");
-css.setAttribute("rel","stylesheet");
-css.setAttribute("href","module/css/CreateParts_style.css");
+const css = document.createElement("link");
+css.setAttribute("rel", "stylesheet");
+css.setAttribute("href", "module/css/CreateParts_style.css");
 document.getElementsByTagName("head")[0].appendChild(css);
 class element {
-    constructor({ tagName = 'div', position = 'auto', width, height, className} = {}) {
-        if (typeof tagName !== 'string') { return; }
-        const body = document.createElement(tagName);
-        if(typeof width === 'number'||typeof width === 'string'){body.style.width = width;}
-        if(typeof height === 'number'||typeof width === 'string'){body.style.height = height;}
+    constructor({ tagName = 'div', position = 'auto', width, height, className, mainInnerHTML } = {}) {
+        const body = typeof tagName === 'string' ? document.createElement(tagName) : document.createElement('div');
+        if (typeof width === 'number' || typeof width === 'string') { body.style.width = width; }
+        if (typeof height === 'number' || typeof width === 'string') { body.style.height = height; }
         switch (position) {
             case 'relative':
                 body.classList.add('crP-posOP-rerative');
@@ -18,20 +17,34 @@ class element {
             default:
                 break;
         }
-        if(Array.isArray(className)){
+        if (Array.isArray(className)) {
             className.forEach((x) => {
                 addClass(x)
             })
         }
-        else{
+        else {
             addClass(className);
         }
         function addClass(name) {
-            if (typeof name === 'string'&&name.length > 0){
+            if (typeof name === 'string' && name.length > 0) {
                 body.classList.add(name);
             }
         }
         this.body = body;
+        this.mainInner = body;
+        if (mainInnerHTML) {
+            this.mainInner.append(mainInnerHTML);
+        }
+    }
+    resize(width, height) {
+        const body = this.body;
+        if (typeof width === 'number' || typeof width === 'string') { body.style.width = width; }
+        if (typeof height === 'number' || typeof width === 'string') { body.style.height = height; }
+    }
+    move(top, left) {
+        const body = this.body;
+        if (typeof top === 'number' || typeof top === 'string') { body.style.top = top; }
+        if (typeof left === 'number' || typeof left === 'string') { body.style.left = left; }
     }
 }
 class loader extends element {
@@ -43,11 +56,10 @@ class loader extends element {
             height: height,
             className: className
         })
-        console.log()
-        const root= this.body.attachShadow({
-            mode:'open'
+        const root = this.body.attachShadow({
+            mode: 'open'
         });
-        root.innerHTML=`
+        root.innerHTML = `
         <style>
         :host {
             display: block;
@@ -86,11 +98,21 @@ class loader extends element {
         }
         </style>
         `;
-
     }
 }
 class multiple extends element {
-    constructor({ tagName = 'section', position = 'auto', width, height, className, child = { tagName: 'div', className },quantity = 2 } = {}) {
+    constructor({
+        tagName = 'section',
+        position = 'auto',
+        width, height, className,
+        child = {
+            tagName: 'div',
+            className,
+            position: 'auto',
+            width, height,
+        },
+        quantity = 2
+    } = {}) {
         const classNameArray = ['crP-posOP-rerative'];
         super({
             tagName: tagName,
@@ -102,19 +124,31 @@ class multiple extends element {
         const body = this.body;
         const section = new Array(quantity);
         for (let i = 0; i < quantity; i++) {
-            section[i] = new element({
-                tagName: child.tagName,
-                position: 'rerative',
-                className: child.className
-            }).body
+            section[i] = new element(child).body
             body.appendChild(section[i]);
-            
         }
-        this.section = section
+        this.mainInner=section;
     }
 }
 class fullscreenLoader extends element {
-    constructor({ tagName = 'section', position = 'absolute',className,child = { className,child:{className} } , innerHTML=''} = {}) {
+    constructor({
+        tagName = 'section',
+        position = 'absolute',
+        className,
+        child = {
+            className,
+            tagName: 'section',
+            position: 'rerative',
+            width, height,
+            child: {
+                className,
+                tagName: 'div',
+                position: 'auto',
+                width, height,
+            }
+        },
+        mainInnerHTML='',
+    } = {}) {
         const classNameArray = ['crP-posOP-centering'];
         super({
             tagName: tagName,
@@ -123,24 +157,19 @@ class fullscreenLoader extends element {
             height: '100vh',
             className: classNameArray.concat(className),
         })
-        const body=this.body;
-        const inner = new multiple({
-            tagName: 'section',
-            position: 'rerative',
-            quantity: 2,
-            className: child.className,
-            child: {
-                tagName: 'div',
-                className:child.child.className
-            }
-        })
-        const loderArea = inner.section[0];
-        const textArea = inner.section[1];
+        this.move(0,0);
+        const body = this.body;
+        const inner = new multiple(
+            Object.assign({quantity:2,},child)
+        )
+        const loderArea = inner.mainInner[0];
+        const textArea = inner.mainInner[1];
         loderArea.appendChild(new loader().body)
-        textArea.append(innerHTML);
+        textArea.append(mainInnerHTML);
         body.appendChild(inner.body);
+        this.mainInner=textArea;
     }
 }
 export {
-    element, loader,multiple,fullscreenLoader
+    element, loader, multiple, fullscreenLoader
 }

@@ -28,19 +28,16 @@ await Ammo().then(async function (Ammo) {
                 tagName: 'div',
                 quantity: 2,
             })
-            innerHTML.section[0].innerText = text1;
-            innerHTML.section[1].innerText = text2;
+            innerHTML.mainInner[0].innerText = text1;
+            innerHTML.mainInner[1].innerText = text2;
             super({
                 child: {
                     className: ['centering'],
-                    child: {
-                        className: ['title', 'white',]
-                    }
                 },
                 className: 'bac-black',
-                innerHTML: innerHTML.body
+                mainInnerHTML: innerHTML.body
             });
-    
+            this.mainInner.classList.add('title','white')
         }
         add() {
             document.body.appendChild(this.body);
