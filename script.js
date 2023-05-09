@@ -208,6 +208,7 @@ await Ammo().then(async function (Ammo) {
                 steeringClamp: 0.8,
                 maxEngineForce: 1000,
                 maxBreakingForce: 1000,
+                
             }
 
             // Raycast Vehicle
