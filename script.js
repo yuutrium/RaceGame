@@ -157,36 +157,34 @@ await Ammo().then(async function (Ammo) {
             if (!position instanceof Ammo.btVector3) { console.error(createMassage.argumentError('Ammo.btVector3')); return false }
             if (!quaternion instanceof Ammo.btQuaternion) { console.error(createMassage.argumentError('Ammo.btQuaternion')); return false }
             const VehicleSettings = {
-                chassisWidth: 2,
-                chassisHeight: 1,
-                chassisLength: 5,
-                massVehicle: 500,
-                wheelRadius: 2,
+                chassisWidth: 2.4,
+                chassisHeight: 2.6,
+                chassisLength: 4,
+                massVehicle:1000,
+                wheelRadius: 2.2,
                 wheelAxisPositionBack: -1.8,
                 wheelHalfTrackBack: 1.2,
-                wheelAxisHeightBack: -0.6,
+                wheelAxisHeightBack: 0.3,
 
                 wheelAxisFrontPosition: 2.1,
                 wheelHalfTrackFront: 1.2,
-                wheelAxisHeightFront: -0.6,
+                wheelAxisHeightFront: 0.3,
                 friction: 1000,
-                suspensionStiffness: 5.00,
-                suspensionDamping: 10.0,
-                suspensionCompression: 2,
-                suspensionRestLength: 0.6,
+                suspensionStiffness: 30.0,
+                suspensionDamping: 4.6,
+                suspensionCompression:1.0,
+                suspensionRestLength: 1.2,
                 rollInfluence: 0.2,
 
-                steeringIncrement: .3,
-                steeringClamp: 1,
-                maxEngineForce: 500,
-                maxBreakingForce: 40,
+                steeringIncrement: 0.2,
+                steeringClamp: 0.8,
+                maxEngineForce: 1000,
+                maxBreakingForce: 500,
             }
             // Raycast Vehicle
             const DISABLE_DEACTIVATION = 4;
-            const body = new BoxCollider({
-                w: VehicleSettings.chassisWidth,
-                h: VehicleSettings.chassisHeight,
-                l: VehicleSettings.chassisLength,
+            const body = new PlaneCollider({
+                size:new Ammo.btVector3(VehicleSettings.chassisWidth, VehicleSettings.chassisHeight, VehicleSettings.chassisLength),
                 position: position,
                 quaternion: quaternion,
                 mass: VehicleSettings.massVehicle,
@@ -344,11 +342,10 @@ await Ammo().then(async function (Ammo) {
     await addModelFromArray(modelArrray, true);
     await initAmmo();
     displayLoader.remove();
-    tick();
+   
     function tick() {
         cameraControls.update();
         renderer.render(scene, camera); // レンダリング
-        requestAnimationFrame(tick);
     }
     function initWindow() {
         window.addEventListener('resize', resizeWindow);
@@ -433,7 +430,7 @@ await Ammo().then(async function (Ammo) {
         async function addCollider() {
             async function addcourseCollider() {
                 const RBP1 = await GLTFLoader.loadAsync('./models/RB/RBP1.glb');
-                AddColliderFromAllMeshes(RBP1, new Ammo.btVector3(30, 30, 30), new Ammo.btVector3(0, -1, 0));
+                AddColliderFromAllMeshes(RBP1, new Ammo.btVector3(30, 30, 30), new Ammo.btVector3(0, -3, 0));
                 const RBP2 = await GLTFLoader.loadAsync('./models/RB/RBP2.glb');
                 AddColliderFromAllMeshes(RBP2, new Ammo.btVector3(30, 30, 30));
                 const RBPW1 = await GLTFLoader.loadAsync('./models/RB/RBPW1.glb');
@@ -473,7 +470,7 @@ await Ammo().then(async function (Ammo) {
                 syncList.push(car.getSyncFunc())
             }
             await addcourseCollider();
-            const planebody = new PlaneCollider({ size: new Ammo.btVector3(1000, 0, 1000), position: new Ammo.btVector3(0, 5, 0), mass: 0 })
+            const planebody = new PlaneCollider({ size: new Ammo.btVector3(1000, 0, 1000), position: new Ammo.btVector3(0, 0, 0), mass: 0 })
             physicsWorld.addRigidBody(planebody);
             const sphereBody = new SphereCollider({ radius: 1, mass: 1, position: new Ammo.btVector3(250, 200, 200) })
             sphereBody.setRestitution(0.2);
@@ -489,11 +486,13 @@ await Ammo().then(async function (Ammo) {
             const deltaTime = 1 / 60; // タイムステップを設定
             for (var i = 0; i < 5; i++) {
                 physicsWorld.stepSimulation(deltaTime);
+                syncList.forEach(x => {
+                    if (typeof x !== 'function') { console.error(createMassage.argumentError('function')); return };
+                    x();
+                })
             }
-            syncList.forEach(x => {
-                if (typeof x !== 'function') { console.error(createMassage.argumentError('function')); return };
-                x();
-            })
+
+            tick();
             requestAnimationFrame(updatePhysicsWorld);
         }
         updatePhysicsWorld();
